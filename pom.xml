@@ -24,6 +24,10 @@
             <id>lib</id>
             <url>file://${project.basedir}/lib</url>
         </repository>
+        <repository>
+		    <id>xuggle repo</id>
+		    <url>https://files.liferay.com/mirrors/xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
+		    </repository>
     </repositories>
 
     <developers>
@@ -63,6 +67,11 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-core</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.openimaj</groupId>
+			<artifactId>faces</artifactId>
+			<version>1.3</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
@@ -141,7 +150,23 @@
             <artifactId>httpasyncclient</artifactId>
             <version>4.1.4</version>
         </dependency>
-
+		
+		<!-- webcam-capture dependency -->
+		<dependency>
+		  <groupId>com.github.sarxos</groupId>
+		  <artifactId>webcam-capture</artifactId>
+		  <version>0.3.10</version>
+		</dependency>
+		<dependency>
+		    <groupId>xuggle</groupId>
+		    <artifactId>xuggle-xuggler</artifactId>
+		    <version>5.4</version>
+        </dependency>
+        <dependency>
+		    <groupId>org.jboss.netty</groupId>
+		    <artifactId>netty</artifactId>
+		    <version>3.2.0.Final</version>
+		</dependency>
 
     </dependencies>
     <build>

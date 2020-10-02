@@ -1,18 +1,21 @@
 package com.amazonaws.kinesisvideo.demoapp;
 
+import static com.amazonaws.kinesisvideo.util.StreamInfoConstants.ABSOLUTE_TIMECODES;
 import com.amazonaws.kinesisvideo.client.KinesisVideoClient;
-import com.amazonaws.kinesisvideo.demoapp.contants.DemoTrackInfos;
-import com.amazonaws.kinesisvideo.internal.client.mediasource.MediaSource;
+import com.amazonaws.kinesisvideo.client.mediasource.CameraMediaSourceConfiguration;
 import com.amazonaws.kinesisvideo.common.exception.KinesisVideoException;
 import com.amazonaws.kinesisvideo.demoapp.auth.AuthHelper;
+import com.amazonaws.kinesisvideo.demoapp.contants.DemoTrackInfos;
+import com.amazonaws.kinesisvideo.internal.client.mediasource.MediaSource;
 import com.amazonaws.kinesisvideo.java.client.KinesisVideoJavaClientFactory;
 import com.amazonaws.kinesisvideo.java.mediasource.file.AudioVideoFileMediaSource;
 import com.amazonaws.kinesisvideo.java.mediasource.file.AudioVideoFileMediaSourceConfiguration;
+import com.amazonaws.kinesisvideo.java.mediasource.file.CameraMediaSource;
 import com.amazonaws.kinesisvideo.java.mediasource.file.ImageFileMediaSource;
 import com.amazonaws.kinesisvideo.java.mediasource.file.ImageFileMediaSourceConfiguration;
+import com.amazonaws.kinesisvideo.producer.StreamInfo;
 import com.amazonaws.regions.Regions;
-
-import static com.amazonaws.kinesisvideo.util.StreamInfoConstants.ABSOLUTE_TIMECODES;
+import com.github.sarxos.webcam.Webcam;
 
 /**
  * Demo Java Producer.
@@ -40,16 +43,16 @@ public final class DemoAppMain {
             // create Kinesis Video high level client
             final KinesisVideoClient kinesisVideoClient = KinesisVideoJavaClientFactory
                     .createKinesisVideoClient(
-                            Regions.US_WEST_2,
+                            Regions.US_EAST_1,
                             AuthHelper.getSystemPropertiesCredentialsProvider());
 
             // create a media source. this class produces the data and pushes it into
             // Kinesis Video Producer lower level components
-            final MediaSource mediaSource = createImageFileMediaSource();
+            //final MediaSource mediaSource = createImageFileMediaSource();
 
             // Audio/Video sample is available for playback on HLS (Http Live Streaming)
             //final MediaSource mediaSource = createFileMediaSource();
-
+            final MediaSource mediaSource = createCameraMediaSource();
             // register media source with Kinesis Video Client
             kinesisVideoClient.registerMediaSource(mediaSource);
 
@@ -58,6 +61,33 @@ public final class DemoAppMain {
         } catch (final KinesisVideoException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static MediaSource createCameraMediaSource() {
+      Webcam webcam = Webcam.getDefault();
+      
+      byte[] codecPrivateData = { 0x01, 0x42, 0x00, 0x20, (byte) 0xff, (byte) 0xe1, 0x00, 0x23, 0x27, 0x42, 0x00, 0x20, (byte) 0x89, (byte) 0x8b, 0x60, 0x28, 0x02, (byte) 0xdd, (byte) 0x80, (byte) 0x9e, 0x00, 0x00, 0x4e, 0x20, 0x00, 0x0f, 0x42, 0x41, (byte) 0xc0, (byte) 0xc0, 0x01, 0x77, 0x00, 0x00, 0x5d, (byte) 0xc1, 0x7b, (byte) 0xdf, 0x07, (byte) 0xc2, 0x21, 0x1b, (byte) 0x80, 0x01, 0x00, 0x04, 0x28, (byte) 0xce, 0x1f, 0x20 };
+      
+      final CameraMediaSourceConfiguration configuration =
+              new CameraMediaSourceConfiguration.Builder()
+              .withFrameRate(22)
+              .withRetentionPeriodInHours(1)
+              .withCameraId(webcam.getName())
+              .withIsEncoderHardwareAccelerated(false)
+              .withEncodingMimeType("video/avc")
+              .withNalAdaptationFlags(StreamInfo.NalAdaptationFlags.NAL_ADAPTATION_FLAG_NONE)
+              .withIsAbsoluteTimecode(false)
+              .withEncodingBitRate(200000)
+              .withHorizontalResolution(640)
+              .withVerticalResolution(480)
+              .withCodecPrivateData(codecPrivateData)
+              .build();
+
+      final CameraMediaSource mediaSource = new CameraMediaSource(STREAM_NAME);
+      
+      mediaSource.setupWebCam(webcam);
+      mediaSource.configure(configuration);
+      return mediaSource;
     }
 
     /**

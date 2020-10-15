@@ -72,6 +72,12 @@
         	<groupId>org.openimaj</groupId>
 			<artifactId>faces</artifactId>
 			<version>1.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xuggle</groupId>
+					<artifactId>xuggle-xuggler-lgpl</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>

@@ -43,7 +43,7 @@ public final class DemoAppMain {
             // create Kinesis Video high level client
             final KinesisVideoClient kinesisVideoClient = KinesisVideoJavaClientFactory
                     .createKinesisVideoClient(
-                            Regions.US_WEST_2,
+                            Regions.US_EAST_1,
                             AuthHelper.getSystemPropertiesCredentialsProvider());
 
             // create a media source. this class produces the data and pushes it into
